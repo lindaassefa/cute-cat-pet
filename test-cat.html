@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cat Name Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .name-input {
+            padding: 15px;
+            border: 2px solid #4ecdc4;
+            border-radius: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .save-btn {
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 Test Cat Name Input</h1>
+        
+        <div>
+            <input type="text" class="name-input" id="name-input" placeholder="Enter cat name..." maxlength="20">
+            <button class="save-btn" onclick="saveName()">Save Name</button>
+        </div>
+        
+        <button class="clear-btn" onclick="clearStorage()">Clear All Data</button>
+        
+        <div class="status" id="status">
+            <h3>Status:</h3>
+            <p>Saved name: <span id="saved-name">None</span></p>
+            <p>Input visible: <span id="input-visible">Yes</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Clear localStorage on page load to ensure fresh start
+        localStorage.removeItem('catName');
+        localStorage.removeItem('catTodos');
+        
+        function saveName() {
+            const name = document.getElementById('name-input').value.trim();
+            if (name) {
+                localStorage.setItem('catName', name);
+                updateStatus();
+                alert('Name saved: ' + name);
+            } else {
+                alert('Please enter a name!');
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('name-input').value = '';
+            updateStatus();
+            alert('All data cleared!');
+        }
+        
+        function updateStatus() {
+            const savedName = localStorage.getItem('catName') || 'None';
+            const inputVisible = document.getElementById('name-input').style.display !== 'none';
+            
+            document.getElementById('saved-name').textContent = savedName;
+            document.getElementById('input-visible').textContent = inputVisible ? 'Yes' : 'No';
+        }
+        
+        // Update status on page load
+        updateStatus();
+    </script>
+</body>
+</html> 

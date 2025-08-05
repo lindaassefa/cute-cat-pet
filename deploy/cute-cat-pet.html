@@ -1,0 +1,3916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Cat Pet - Todo Companion</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#764ba2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CatPet">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16x16.png">
+    
+    <!-- Accessibility Meta Tags -->
+    <meta name="description" content="An interactive cat pet with todo list and gamification features">
+    <meta name="keywords" content="cat, pet, todo, game, interactive">
+    <meta name="author" content="Cat Pet App">
+    <meta name="robots" content="index, follow">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Quicksand:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: 
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%),
+                linear-gradient(45deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(78, 205, 196, 0.2) 0%, transparent 50%);
+            background-attachment: fixed;
+            font-family: 'Quicksand', sans-serif;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: all 1s ease;
+        }
+        
+        /* Day/Night Cycle */
+        body.day {
+            background: 
+                linear-gradient(135deg, #87CEEB 0%, #98D8E8 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+        }
+        
+        body.night {
+            background: 
+                linear-gradient(135deg, #1a1a2e 0%, #16213e 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        }
+        
+        /* Seasonal Themes */
+        body.spring {
+            background: 
+                linear-gradient(135deg, #98FB98 0%, #90EE90 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+        }
+        
+        body.summer {
+            background: 
+                linear-gradient(135deg, #FFD700 0%, #FFA500 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+        }
+        
+        body.autumn {
+            background: 
+                linear-gradient(135deg, #D2691E 0%, #CD853F 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 165, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.2) 0%, transparent 50%);
+        }
+        
+        body.winter {
+            background: 
+                linear-gradient(135deg, #F0F8FF 0%, #E6E6FA 100%),
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.5) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+        }
+        
+        /* Parallax background layers */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(255, 182, 193, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(150, 206, 180, 0.1) 0%, transparent 50%);
+            animation: parallax-float 20s ease-in-out infinite;
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            animation: parallax-float 15s ease-in-out infinite reverse;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            min-height: 100vh;
+        }
+        
+        .pet-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pet-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .todo-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+        }
+        
+        .cat-name {
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .cat-name:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .name-input-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .name-input {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            text-align: center;
+            width: 200px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .save-name-btn {
+            background: linear-gradient(135deg, #4ecdc4 0%, #6ee7df 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .save-name-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+        
+        .cat-container {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .cat {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+        
+        .cat:hover {
+            transform: scale(1.05);
+        }
+        
+        .cat-svg {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+        }
+        
+        /* Cat Accessories */
+        .cat-collar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 8px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            border-radius: 4px;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cat-collar.show {
+            opacity: 1;
+        }
+        
+        .cat-hat {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(45deg, #4ecdc4, #6ee7df);
+            border-radius: 50% 50% 0 0;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cat-hat.show {
+            opacity: 1;
+        }
+        
+        .status-panel {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status-bar {
+            flex: 1;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 6px;
+            margin-left: 10px;
+            overflow: hidden;
+        }
+        
+        .status-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .hunger-fill { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        .happiness-fill { background: linear-gradient(90deg, #4ecdc4, #6ee7df); }
+        .energy-fill { background: linear-gradient(90deg, #ffd93d, #ffb347); }
+        .growth-fill { background: linear-gradient(90deg, #45b7d1, #67c7e0); }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .achievements-panel {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .achievement {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #333;
+            animation: achievement-pop 0.5s ease;
+        }
+        
+        @keyframes achievement-pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .todo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .todo-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .add-todo {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .add-todo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .todo-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .todo-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .todo-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .todo-form-row {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .todo-priority, .todo-due-date, .todo-category {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .todo-priority:focus, .todo-due-date:focus, .todo-category:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .todo-form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn.danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+        }
+        
+        .todo-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .priority-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .priority-badge.high {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .priority-badge.medium {
+            background: #ffd93d;
+            color: #333;
+        }
+        
+        .priority-badge.low {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .category-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .due-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .due-date.overdue {
+            color: #ff4757;
+            font-weight: 600;
+        }
+        
+        .progress-chart {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .todo-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: grab;
+            position: relative;
+        }
+        
+        .todo-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+        }
+        
+        .todo-item.priority-high {
+            border-left: 4px solid #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        }
+        
+        .todo-item.priority-medium {
+            border-left: 4px solid #ffd93d;
+            background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+        }
+        
+        .todo-item.priority-low {
+            border-left: 4px solid #4ecdc4;
+            background: linear-gradient(135deg, #f0fffd 0%, #ffffff 100%);
+        }
+        
+        .todo-item.overdue {
+            border-left: 4px solid #ff4757;
+            background: linear-gradient(135deg, #ffe0e0 0%, #ffffff 100%);
+        }
+        
+        .todo-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .todo-item.completed {
+            background: linear-gradient(135deg, #96ceb4 0%, #a8e6cf 100%);
+            opacity: 0.8;
+        }
+        
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #4ecdc4;
+        }
+        
+        .todo-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+        
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+        
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4ecdc4 0%, #6ee7df 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .message.show {
+            opacity: 1;
+        }
+        
+        .growth-stage {
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            animation: particle-float 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes particle-float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes sleep {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+        
+        @keyframes stretch {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.2); }
+        }
+        
+        .cat.bounce {
+            animation: bounce 0.5s ease;
+        }
+        
+        .cat.sleep {
+            animation: sleep 2s ease-in-out infinite;
+        }
+        
+        .cat.stretch {
+            animation: stretch 1s ease;
+        }
+        
+        /* Idle animations */
+        .cat.tail_swish {
+            animation: tail-swish 3s ease-in-out infinite;
+        }
+        
+        .cat.ear_twitch {
+            animation: ear-twitch 2s ease-in-out infinite;
+        }
+        
+        .cat.tail_flick {
+            animation: tail-flick 1.5s ease-in-out infinite;
+        }
+        
+        .cat.paw_tap {
+            animation: paw-tap 2s ease-in-out infinite;
+        }
+        
+        .cat.tail_wag {
+            animation: tail-wag 2.5s ease-in-out infinite;
+        }
+        
+        .cat.head_tilt {
+            animation: head-tilt 3s ease-in-out infinite;
+        }
+        
+        .cat.yawn {
+            animation: yawn 4s ease-in-out infinite;
+        }
+        
+        .cat.sleep {
+            animation: sleep 6s ease-in-out infinite;
+        }
+        
+        .cat.ear_flick {
+            animation: ear-flick 1s ease-in-out infinite;
+        }
+        
+        .cat.turn_away {
+            animation: turn-away 3s ease-in-out infinite;
+        }
+        
+        .cat.bounce {
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        /* Idle animation keyframes */
+        @keyframes tail-swish {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+        }
+        
+        @keyframes ear-twitch {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.8); }
+        }
+        
+        @keyframes tail-flick {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(15deg); }
+            75% { transform: rotate(-15deg); }
+        }
+        
+        @keyframes paw-tap {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes tail-wag {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(8deg); }
+            75% { transform: rotate(-8deg); }
+        }
+        
+        @keyframes head-tilt {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        @keyframes yawn {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.3); }
+        }
+        
+        @keyframes ear-flick {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+        }
+        
+        @keyframes turn-away {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+        }
+        
+        /* Seasonal accessories */
+        .seasonal-hat {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .seasonal-hat.show {
+            opacity: 1;
+        }
+        
+        .santa-hat {
+            width: 60px;
+            height: 45px;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            border-radius: 50% 50% 0 0;
+            position: relative;
+        }
+        
+        .santa-hat::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .sunglasses {
+            width: 50px;
+            height: 20px;
+            background: linear-gradient(45deg, #000000, #333333);
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .sunglasses::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 15px;
+            height: 15px;
+            background: #87CEEB;
+            border-radius: 50%;
+        }
+        
+        .sunglasses::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            background: #87CEEB;
+            border-radius: 50%;
+        }
+        
+        /* Floating hearts animation */
+        .floating-heart {
+            position: absolute;
+            color: #ff6b6b;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 100;
+            animation: float-heart 3s ease-out forwards;
+        }
+        
+        @keyframes float-heart {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-50px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.8);
+            }
+        }
+        
+        /* Sparkle effects for completed todos */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #ffd93d, #ff6b6b);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+            animation: sparkle-animation 1.5s ease-out forwards;
+        }
+        
+        @keyframes sparkle-animation {
+            0% {
+                opacity: 1;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.5) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) rotate(360deg);
+            }
+        }
+        
+        /* Glowing borders based on happiness */
+        .pet-section {
+            transition: all 0.5s ease;
+        }
+        
+        .pet-section.happy {
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.1),
+                0 0 20px rgba(78, 205, 196, 0.3),
+                0 0 40px rgba(78, 205, 196, 0.1);
+        }
+        
+        .pet-section.very-happy {
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.1),
+                0 0 30px rgba(78, 205, 196, 0.5),
+                0 0 60px rgba(78, 205, 196, 0.2);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 
+                    0 10px 30px rgba(0, 0, 0, 0.1),
+                    0 0 30px rgba(78, 205, 196, 0.5),
+                    0 0 60px rgba(78, 205, 196, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 10px 30px rgba(0, 0, 0, 0.1),
+                    0 0 40px rgba(78, 205, 196, 0.7),
+                    0 0 80px rgba(78, 205, 196, 0.3);
+            }
+        }
+        
+        /* Theme transitions */
+        .theme-transition {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .theme-transition * {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Parallax animations */
+        @keyframes parallax-float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+            }
+            25% {
+                transform: translateY(-10px) translateX(5px);
+            }
+            50% {
+                transform: translateY(-5px) translateX(-5px);
+            }
+            75% {
+                transform: translateY(5px) translateX(10px);
+            }
+        }
+        
+        /* Weather Effects */
+        .weather-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .rain-drop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(255, 255, 255, 0.8));
+            animation: rain-fall 1s linear infinite;
+        }
+        
+        .snow-flake {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: snow-fall 3s linear infinite;
+        }
+        
+        .sun-ray {
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 0, 0.8), transparent);
+            animation: sun-shine 4s ease-in-out infinite;
+        }
+        
+        @keyframes rain-fall {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes snow-fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes sun-shine {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+        }
+        
+        /* Interactive Background Elements */
+        .background-element {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        
+        .background-element:hover {
+            transform: scale(1.1);
+        }
+        
+        .tree {
+            width: 60px;
+            height: 80px;
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            border-radius: 50% 50% 0 0;
+            position: relative;
+        }
+        
+        .tree::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 20px;
+            background: #8B4513;
+        }
+        
+        .cloud {
+            width: 80px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 40px;
+            position: relative;
+        }
+        
+        .cloud::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+        
+        .cloud::after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+        
+        /* XP System */
+        .xp-bar {
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+            width: 200px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.5s ease;
+        }
+        
+        .level-display {
+            position: absolute;
+            top: 0.5rem;
+            left: 2rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            z-index: 1000;
+            animation: level-up-animation 2s ease-out forwards;
+        }
+        
+        @keyframes level-up-animation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-btn {
+                width: 200px;
+            }
+            
+            /* Mobile-specific improvements */
+            .cat-container {
+                transform: scale(0.8);
+                margin: 1rem 0;
+            }
+            
+            .status-bars {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .status-bar {
+                height: 15px;
+            }
+            
+            .todo-item {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .todo-form {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .todo-form-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .xp-bar {
+                width: 150px;
+                height: 15px;
+            }
+            
+            .level-display {
+                font-size: 0.8rem;
+            }
+            
+            /* Touch-friendly buttons */
+            .control-btn {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation;
+            }
+            
+            /* Swipe gestures */
+            .pet-section {
+                touch-action: pan-y;
+            }
+            
+            /* Mobile notifications */
+            .notification {
+                position: fixed;
+                bottom: 1rem;
+                left: 1rem;
+                right: 1rem;
+                z-index: 1000;
+            }
+        }
+        
+        /* Touch gesture styles */
+        .touch-feedback {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+        
+        .swipe-area {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .swipe-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .swipe-indicator.show {
+            opacity: 1;
+        }
+        
+        /* Audio Controls */
+        .audio-panel {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .audio-panel .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-panel .close-btn:hover {
+            background: #ff4757;
+            transform: scale(1.1);
+        }
+        
+        .audio-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .audio-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* Install Button */
+        .install-btn {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Voice Command Button */
+        .voice-btn {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            background: linear-gradient(135deg, #FF6B6B, #ee5a52);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .voice-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .voice-btn.listening {
+            animation: pulse 1s infinite;
+        }
+        
+        /* Settings Button */
+        .settings-btn {
+            position: fixed;
+            bottom: 1rem;
+            left: 5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .settings-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .audio-toggle-btn {
+            position: fixed;
+            bottom: 1rem;
+            left: 9rem;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .audio-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Accessibility and Customization */
+        
+        /* High Contrast Mode */
+        .high-contrast {
+            --bg-primary: #000000;
+            --bg-secondary: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #000000;
+            --accent-primary: #ffff00;
+            --accent-secondary: #00ffff;
+            --border-primary: #ffffff;
+            --shadow-primary: rgba(255, 255, 255, 0.3);
+        }
+        
+        .high-contrast body {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .high-contrast .container {
+            background: var(--bg-secondary) !important;
+            color: var(--text-secondary) !important;
+            border: 2px solid var(--border-primary) !important;
+        }
+        
+        .high-contrast .control-btn {
+            background: var(--accent-primary) !important;
+            color: var(--text-secondary) !important;
+            border: 2px solid var(--border-primary) !important;
+        }
+        
+        .high-contrast .status-bar {
+            background: var(--bg-secondary) !important;
+            border: 2px solid var(--border-primary) !important;
+        }
+        
+        .high-contrast .status-fill {
+            background: var(--accent-primary) !important;
+        }
+        
+        /* Color Blind Friendly Themes */
+        .colorblind-friendly {
+            --primary-color: #1f77b4;
+            --secondary-color: #ff7f0e;
+            --success-color: #2ca02c;
+            --warning-color: #d62728;
+            --info-color: #9467bd;
+            --light-color: #8c564b;
+        }
+        
+        .colorblind-friendly .control-btn {
+            background: var(--primary-color) !important;
+        }
+        
+        .colorblind-friendly .status-fill.hunger {
+            background: var(--secondary-color) !important;
+        }
+        
+        .colorblind-friendly .status-fill.happiness {
+            background: var(--success-color) !important;
+        }
+        
+        .colorblind-friendly .status-fill.energy {
+            background: var(--info-color) !important;
+        }
+        
+        /* Font Size Adjustments */
+        .font-small {
+            font-size: 0.8rem !important;
+        }
+        
+        .font-medium {
+            font-size: 1rem !important;
+        }
+        
+        .font-large {
+            font-size: 1.2rem !important;
+        }
+        
+        .font-extra-large {
+            font-size: 1.5rem !important;
+        }
+        
+        /* Reduced Motion */
+        .reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        
+        .reduced-motion .cat {
+            animation: none !important;
+        }
+        
+        .reduced-motion .floating-heart,
+        .reduced-motion .sparkle {
+            display: none !important;
+        }
+        
+        /* Custom Color Themes */
+        .theme-sunset {
+            --theme-primary: #ff6b6b;
+            --theme-secondary: #feca57;
+            --theme-accent: #ff9ff3;
+            --theme-background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+        }
+        
+        .theme-ocean {
+            --theme-primary: #54a0ff;
+            --theme-secondary: #5f27cd;
+            --theme-accent: #00d2d3;
+            --theme-background: linear-gradient(135deg, #54a0ff 0%, #5f27cd 100%);
+        }
+        
+        .theme-forest {
+            --theme-primary: #10ac84;
+            --theme-secondary: #1dd1a1;
+            --theme-accent: #00d2d3;
+            --theme-background: linear-gradient(135deg, #10ac84 0%, #1dd1a1 100%);
+        }
+        
+        .theme-midnight {
+            --theme-primary: #2c3e50;
+            --theme-secondary: #34495e;
+            --theme-accent: #3498db;
+            --theme-background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+        
+        /* Accessibility Panel */
+        .accessibility-panel {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .accessibility-panel .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .accessibility-panel .close-btn:hover {
+            background: #ff4757;
+            transform: scale(1.1);
+        }
+        
+        .accessibility-panel h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .accessibility-section {
+            margin-bottom: 1rem;
+        }
+        
+        .accessibility-section h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .accessibility-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .accessibility-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .accessibility-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .accessibility-btn.active {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .font-size-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .font-size-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .font-size-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .font-size-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Focus indicators for keyboard navigation */
+        .control-btn:focus,
+        .accessibility-btn:focus,
+        .font-size-btn:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+        
+        /* Screen reader only text */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Keyboard navigation support */
+        .keyboard-nav .control-btn:focus {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px #667eea;
+        }
+        
+        /* High contrast focus indicators */
+        .high-contrast .control-btn:focus {
+            outline: 3px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container" id="weather-container"></div>
+    
+    <div class="level-display" id="level-display">Level 1</div>
+    <div class="xp-bar" id="xp-bar">
+        <div class="xp-fill" id="xp-fill" style="width: 0%"></div>
+    </div>
+    
+    <button class="voice-btn" onclick="startVoiceRecognition()" title="Voice Commands">🎤</button>
+    <button class="settings-btn" onclick="showAccessibilityPanel()" title="Accessibility Settings">⚙️</button>
+    <button class="audio-toggle-btn" onclick="showAudioPanel()" title="Audio Settings">🔊</button>
+    
+    <div class="accessibility-panel" id="accessibility-panel">
+        <button class="close-btn" onclick="hideAccessibilityPanel()" aria-label="Close accessibility settings">×</button>
+        <h3>♿ Accessibility Settings</h3>
+        
+        <div class="accessibility-section">
+            <h4>High Contrast</h4>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" onclick="toggleHighContrast()" id="high-contrast-btn">High Contrast</button>
+                <button class="accessibility-btn" onclick="toggleColorblindFriendly()" id="colorblind-btn">Color Blind Friendly</button>
+            </div>
+        </div>
+        
+        <div class="accessibility-section">
+            <h4>Font Size</h4>
+            <div class="font-size-controls">
+                <button class="font-size-btn" onclick="setFontSize('small')" id="font-small">A-</button>
+                <button class="font-size-btn active" onclick="setFontSize('medium')" id="font-medium">A</button>
+                <button class="font-size-btn" onclick="setFontSize('large')" id="font-large">A+</button>
+                <button class="font-size-btn" onclick="setFontSize('extra-large')" id="font-extra-large">A++</button>
+            </div>
+        </div>
+        
+        <div class="accessibility-section">
+            <h4>Motion</h4>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" onclick="toggleReducedMotion()" id="reduced-motion-btn">Reduced Motion</button>
+            </div>
+        </div>
+        
+        <div class="accessibility-section">
+            <h4>Theme</h4>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" onclick="setTheme('default')" id="theme-default">Default</button>
+                <button class="accessibility-btn" onclick="setTheme('sunset')" id="theme-sunset">Sunset</button>
+                <button class="accessibility-btn" onclick="setTheme('ocean')" id="theme-ocean">Ocean</button>
+                <button class="accessibility-btn" onclick="setTheme('forest')" id="theme-forest">Forest</button>
+                <button class="accessibility-btn" onclick="setTheme('midnight')" id="theme-midnight">Midnight</button>
+            </div>
+        </div>
+        
+        <div class="accessibility-section">
+            <h4>Navigation</h4>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" onclick="toggleKeyboardNav()" id="keyboard-nav-btn">Keyboard Navigation</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container theme-transition">
+        <div class="pet-section">
+            <h1 class="title">🐱 Cute Cat Pet</h1>
+            
+            <div class="name-input-container" id="name-input-container">
+                <input type="text" class="name-input" id="name-input" placeholder="Enter your cat's name..." maxlength="20" onkeypress="handleNameKeyPress(event)">
+                <button class="save-name-btn" onclick="saveCatName()">Save Name</button>
+            </div>
+            
+            <div class="cat-name" id="cat-name" style="display: none;">
+                <span id="cat-name-text" onclick="editCatName()" style="cursor: pointer; text-decoration: underline; color: #667eea;"></span>
+                <span style="font-size: 0.8rem; margin-left: 5px; opacity: 0.7;">(click to edit)</span>
+            </div>
+            
+            <div class="growth-stage" id="growth-stage">Kitten</div>
+            
+            <div class="breed-info" id="breed-info" style="text-align: center; margin: 10px 0; font-size: 0.9rem; color: #667eea;">
+                <span id="breed-name"></span> • <span id="mood-indicator"></span>
+            </div>
+            
+            <div class="cat-container">
+                <div class="particles" id="particles"></div>
+                <div class="cat" id="cat">
+                    <div class="cat-collar" id="cat-collar"></div>
+                    <div class="cat-hat" id="cat-hat"></div>
+                    <div class="seasonal-hat" id="seasonal-hat"></div>
+                    <svg class="cat-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cat body - more realistic proportions -->
+                        <ellipse cx="100" cy="130" rx="35" ry="20" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                        
+                        <!-- Cat head - more realistic -->
+                        <circle cx="100" cy="85" r="28" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                        
+                        <!-- Cat ears - more realistic triangular shape -->
+                        <polygon points="85,65 75,40 95,55" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                        <polygon points="115,65 125,40 105,55" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+                        
+                        <!-- Inner ear detail -->
+                        <polygon points="87,62 80,45 92,52" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>
+                        <polygon points="113,62 120,45 108,52" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>
+                        
+                        <!-- Cat eyes - more realistic with pupils -->
+                        <ellipse cx="92" cy="80" rx="4" ry="6" fill="#4A90E2"/>
+                        <ellipse cx="108" cy="80" rx="4" ry="6" fill="#4A90E2"/>
+                        <ellipse cx="90" cy="78" rx="2" ry="3" fill="black"/>
+                        <ellipse cx="106" cy="78" rx="2" ry="3" fill="black"/>
+                        <circle cx="91" cy="77" r="1" fill="white"/>
+                        <circle cx="107" cy="77" r="1" fill="white"/>
+                        
+                        <!-- Cat nose - more realistic -->
+                        <ellipse cx="100" cy="88" rx="2" ry="1.5" fill="#FF69B4"/>
+                        
+                        <!-- Cat mouth - more realistic -->
+                        <path d="M95 92 Q100 96 105 92" stroke="#654321" stroke-width="1.5" fill="none"/>
+                        
+                        <!-- Cat whiskers - more realistic -->
+                        <line x1="75" y1="85" x2="55" y2="80" stroke="#654321" stroke-width="1.5"/>
+                        <line x1="75" y1="88" x2="55" y2="88" stroke="#654321" stroke-width="1.5"/>
+                        <line x1="75" y1="91" x2="55" y2="96" stroke="#654321" stroke-width="1.5"/>
+                        <line x1="125" y1="85" x2="145" y2="80" stroke="#654321" stroke-width="1.5"/>
+                        <line x1="125" y1="88" x2="145" y2="88" stroke="#654321" stroke-width="1.5"/>
+                        <line x1="125" y1="91" x2="145" y2="96" stroke="#654321" stroke-width="1.5"/>
+                        
+                        <!-- Cat tail - more realistic curved -->
+                        <path d="M65 125 Q45 105 55 85 Q65 65 85 75" stroke="#8B4513" stroke-width="4" fill="none"/>
+                        
+                        <!-- Cat paws - more realistic -->
+                        <ellipse cx="85" cy="145" rx="6" ry="4" fill="#8B4513"/>
+                        <ellipse cx="115" cy="145" rx="6" ry="4" fill="#8B4513"/>
+                        
+                        <!-- Cat legs -->
+                        <rect x="80" y="130" width="4" height="15" fill="#8B4513"/>
+                        <rect x="116" y="130" width="4" height="15" fill="#8B4513"/>
+                        
+                        <!-- Cat fur texture -->
+                        <path d="M90 70 Q95 68 100 70 Q105 72 110 70" stroke="#654321" stroke-width="1" fill="none"/>
+                        <path d="M85 75 Q90 73 95 75 Q100 77 105 75" stroke="#654321" stroke-width="1" fill="none"/>
+                        <path d="M80 80 Q85 78 90 80 Q95 82 100 80" stroke="#654321" stroke-width="1" fill="none"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="status-panel" role="group" aria-label="Cat status indicators">
+                <div class="status-item">
+                    <span>Hunger:</span>
+                    <div class="status-bar" role="progressbar" aria-label="Hunger level" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        <div class="status-fill hunger-fill" id="hunger-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Happiness:</span>
+                    <div class="status-bar" role="progressbar" aria-label="Happiness level" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        <div class="status-fill happiness-fill" id="happiness-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Energy:</span>
+                    <div class="status-bar" role="progressbar" aria-label="Energy level" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        <div class="status-fill energy-fill" id="energy-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <span>Growth:</span>
+                    <div class="status-bar" role="progressbar" aria-label="Growth level" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="status-fill growth-fill" id="growth-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievements-panel" id="achievements-panel" style="display: none;">
+                <h4 style="margin-bottom: 10px; color: #333;">🏆 Achievements</h4>
+                <div id="achievements-list"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn" onclick="feedCat()" aria-label="Feed cat" role="button" tabindex="0">🍽️ Feed</button>
+                <button class="control-btn" onclick="playWithCat()" aria-label="Play with cat" role="button" tabindex="0">🎾 Play</button>
+                <button class="control-btn" onclick="petCat()" aria-label="Pet cat" role="button" tabindex="0">❤️ Pet</button>
+                <button class="control-btn" onclick="trainCat()" aria-label="Train cat" role="button" tabindex="0">🎯 Train</button>
+                <button class="control-btn" onclick="toggleAccessories()" aria-label="Toggle cat accessories" role="button" tabindex="0">🎀 Accessories</button>
+                <button class="control-btn" onclick="changeBreed()" aria-label="Change cat breed" role="button" tabindex="0">🐱 Breed</button>
+                <button class="control-btn" onclick="changeWeather()" aria-label="Change weather" role="button" tabindex="0">🌤️ Weather</button>
+                <button class="control-btn" onclick="changeRoom()" aria-label="Change room" role="button" tabindex="0">🏠 Room</button>
+            </div>
+        </div>
+        
+        <div class="todo-section">
+            <div class="todo-header">
+                <h2 class="todo-title">📝 Todo List</h2>
+                <button class="add-todo" onclick="showTodoInput()">+ Add Task</button>
+            </div>
+            
+            <div class="todo-form" id="todo-form" style="display: none;">
+                <input type="text" class="todo-input" id="todo-input" placeholder="Enter a new task...">
+                <div class="todo-form-row">
+                    <select class="todo-priority" id="todo-priority">
+                        <option value="low">🟢 Low Priority</option>
+                        <option value="medium" selected>🟡 Medium Priority</option>
+                        <option value="high">🔴 High Priority</option>
+                    </select>
+                    <input type="date" class="todo-due-date" id="todo-due-date">
+                    <select class="todo-category" id="todo-category">
+                        <option value="personal">🏠 Personal</option>
+                        <option value="work">💼 Work</option>
+                        <option value="health">💪 Health</option>
+                        <option value="learning">📚 Learning</option>
+                        <option value="chores">🧹 Chores</option>
+                    </select>
+                </div>
+                <div class="todo-form-actions">
+                    <button class="control-btn" onclick="saveTodo()">Save Task</button>
+                    <button class="control-btn" onclick="cancelTodo()" style="background: #ff6b6b;">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="progress-chart" id="progress-chart">
+                <div class="chart-title">📊 Progress Overview</div>
+                <div class="chart-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-tasks">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completed-tasks">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completion-rate">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="overdue-tasks">0</div>
+                        <div class="stat-label">Overdue</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="todo-actions">
+                <button class="action-btn" onclick="markAllComplete()">✅ Mark All Complete</button>
+                <button class="action-btn danger" onclick="deleteCompleted()">🗑️ Delete Completed</button>
+                <button class="action-btn" onclick="addTemplate()">📋 Add Template</button>
+                <button class="action-btn" onclick="sortByPriority()">📊 Sort by Priority</button>
+            </div>
+            
+            <div class="todo-list" id="todo-list">
+                <!-- Todo items will be added here -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+
+    <script>
+        class CuteCatPet {
+            constructor() {
+                this.hunger = 100;
+                this.happiness = 100;
+                this.energy = 100;
+                this.growth = 0;
+                this.growthStage = 0;
+                this.growthStages = ['Kitten', 'Young Cat', 'Adult Cat', 'Majestic Cat'];
+                this.todos = JSON.parse(localStorage.getItem('catTodos')) || [];
+                this.catName = localStorage.getItem('catName') || '';
+                this.achievements = JSON.parse(localStorage.getItem('catAchievements')) || [];
+                this.accessories = JSON.parse(localStorage.getItem('catAccessories')) || { collar: false, hat: false };
+                this.taskCount = 0;
+                
+                // Cat breed system
+                this.breed = localStorage.getItem('catBreed') || 'Persian';
+                this.breeds = {
+                    'Persian': {
+                        name: 'Persian',
+                        personality: 'calm',
+                        energyMultiplier: 0.8,
+                        happinessMultiplier: 1.2,
+                        hungerRate: 0.8,
+                        idleAnimations: ['tail_swish', 'ear_twitch', 'stretch'],
+                        messages: [
+                            "Purr... I'm so relaxed... 😌",
+                            "Gentle pets are my favorite... 🥰",
+                            "I love quiet moments with you... 💕",
+                            "So peaceful and content... 😊"
+                        ]
+                    },
+                    'Siamese': {
+                        name: 'Siamese',
+                        personality: 'vocal',
+                        energyMultiplier: 1.3,
+                        happinessMultiplier: 1.0,
+                        hungerRate: 1.2,
+                        idleAnimations: ['tail_flick', 'ear_twitch', 'paw_tap'],
+                        messages: [
+                            "Meow! I have so much to say! 😸",
+                            "Let's play! I'm full of energy! ⚡",
+                            "I love attention and conversation! 🗣️",
+                            "I'm so curious about everything! 🔍"
+                        ]
+                    },
+                    'Maine Coon': {
+                        name: 'Maine Coon',
+                        personality: 'gentle_giant',
+                        energyMultiplier: 1.1,
+                        happinessMultiplier: 1.1,
+                        hungerRate: 1.0,
+                        idleAnimations: ['tail_wag', 'stretch', 'head_tilt'],
+                        messages: [
+                            "I'm big and gentle, just like my heart! 💖",
+                            "I love exploring and adventures! 🏔️",
+                            "I'm so loyal to my human... 🥰",
+                            "I have such a gentle soul... 😌"
+                        ]
+                    }
+                };
+                
+                // Mood system
+                this.mood = 'content';
+                this.moods = {
+                    'sleepy': {
+                        energyMultiplier: 0.5,
+                        happinessMultiplier: 0.8,
+                        idleAnimations: ['yawn', 'stretch', 'sleep'],
+                        messages: [
+                            "Yawn... I'm so tired... 😴",
+                            "I need a nap... 💤",
+                            "Sleepy time... 😪"
+                        ]
+                    },
+                    'playful': {
+                        energyMultiplier: 1.3,
+                        happinessMultiplier: 1.2,
+                        idleAnimations: ['tail_flick', 'paw_tap', 'bounce'],
+                        messages: [
+                            "Let's play! I'm so excited! 🎾",
+                            "I want to chase something! 🏃‍♂️",
+                            "I'm full of energy! ⚡"
+                        ]
+                    },
+                    'grumpy': {
+                        energyMultiplier: 0.7,
+                        happinessMultiplier: 0.6,
+                        idleAnimations: ['tail_swish', 'ear_flick', 'turn_away'],
+                        messages: [
+                            "Hmph... not in the mood... 😤",
+                            "Leave me alone... 😒",
+                            "I'm not happy right now... 😾"
+                        ]
+                    },
+                    'excited': {
+                        energyMultiplier: 1.5,
+                        happinessMultiplier: 1.4,
+                        idleAnimations: ['bounce', 'tail_wag', 'paw_tap'],
+                        messages: [
+                            "I'm so excited! Yay! 🎉",
+                            "This is amazing! I love it! ❤️",
+                            "I can't contain my joy! 😸"
+                        ]
+                    },
+                    'content': {
+                        energyMultiplier: 1.0,
+                        happinessMultiplier: 1.0,
+                        idleAnimations: ['tail_swish', 'ear_twitch', 'stretch'],
+                        messages: [
+                            "I'm happy and content... 😊",
+                            "Life is good... 😌",
+                            "I feel peaceful... 🥰"
+                        ]
+                    }
+                };
+                
+                // Time-based reactions
+                this.lastUpdate = Date.now();
+                this.idleTimer = 0;
+                this.currentIdleAnimation = null;
+                
+                // Gamification System
+                this.xp = parseInt(localStorage.getItem('catXP')) || 0;
+                this.level = parseInt(localStorage.getItem('catLevel')) || 1;
+                this.xpToNextLevel = this.calculateXPToNextLevel();
+                
+                // Environment System
+                this.currentWeather = 'clear';
+                this.currentSeason = this.getCurrentSeason();
+                this.currentTime = this.getCurrentTime();
+                this.unlockedRooms = JSON.parse(localStorage.getItem('unlockedRooms')) || ['garden'];
+                this.currentRoom = localStorage.getItem('currentRoom') || 'garden';
+                
+                // Weather patterns
+                this.weatherPatterns = {
+                    'clear': { moodEffect: 1.0, sound: 'birds' },
+                    'rainy': { moodEffect: 0.8, sound: 'rain' },
+                    'snowy': { moodEffect: 0.9, sound: 'wind' },
+                    'sunny': { moodEffect: 1.2, sound: 'birds' }
+                };
+                
+                // Audio System
+                this.audioContext = null;
+                this.backgroundMusic = null;
+                this.soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+                this.musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+                this.volume = parseFloat(localStorage.getItem('volume')) || 0.7;
+                
+                // Cat sounds
+                this.catSounds = {
+                    meow: ['meow1', 'meow2', 'meow3', 'meow4'],
+                    purr: ['purr1', 'purr2', 'purr3'],
+                    chirp: ['chirp1', 'chirp2'],
+                    achievement: ['achievement1', 'achievement2']
+                };
+                
+                // Background music tracks
+                this.musicTracks = {
+                    happy: 'happy_music',
+                    calm: 'calm_music',
+                    playful: 'playful_music',
+                    sleepy: 'sleepy_music'
+                };
+                
+                // PWA Features
+                this.isPWA = window.matchMedia('(display-mode: standalone)').matches;
+                this.installPrompt = null;
+                this.notificationPermission = false;
+                
+                // Accessibility Features
+                this.accessibilitySettings = {
+                    highContrast: localStorage.getItem('highContrast') === 'true',
+                    colorblindFriendly: localStorage.getItem('colorblindFriendly') === 'true',
+                    reducedMotion: localStorage.getItem('reducedMotion') === 'true',
+                    keyboardNav: localStorage.getItem('keyboardNav') === 'true',
+                    fontSize: localStorage.getItem('fontSize') || 'medium',
+                    theme: localStorage.getItem('theme') || 'default'
+                };
+                
+                this.messages = this.breeds[this.breed].messages;
+                this.init();
+            }
+            
+            init() {
+                this.updateStatusBars();
+                this.updateGrowthStage();
+                this.renderTodos();
+                this.startDecay();
+                this.setupCatInteraction();
+                this.createParticles();
+                this.setupNameDisplay();
+                this.updateAccessories();
+                this.checkAchievements();
+                this.updateBreedInfo();
+                this.updateSeasonalAccessories();
+                this.startIdleAnimations();
+                this.updateTimeBasedMood();
+                this.updateEnvironment();
+                this.updateXPBar();
+                this.initAudio();
+                this.initPWA();
+                this.initAccessibility();
+            }
+            
+            setupNameDisplay() {
+                console.log('Setting up name display, catName:', this.catName);
+                if (this.catName) {
+                    document.getElementById('name-input-container').style.display = 'none';
+                    document.getElementById('cat-name').style.display = 'block';
+                    document.getElementById('cat-name-text').textContent = this.catName;
+                } else {
+                    // Ensure input is visible if no name is set
+                    document.getElementById('name-input-container').style.display = 'block';
+                    document.getElementById('cat-name').style.display = 'none';
+                    // Focus the input
+                    setTimeout(() => {
+                        const input = document.getElementById('name-input');
+                        if (input) {
+                            input.focus();
+                            console.log('Input focused');
+                        }
+                    }, 100);
+                }
+            }
+            
+            saveName(name) {
+                this.catName = name;
+                localStorage.setItem('catName', name);
+                document.getElementById('name-input-container').style.display = 'none';
+                document.getElementById('cat-name').style.display = 'block';
+                document.getElementById('cat-name-text').textContent = name;
+                this.showMessage(`Nice to meet you! I'm ${name}! 😸`);
+                this.playSound('meow');
+            }
+            
+            updateStatusBars() {
+                const hungerBar = document.getElementById('hunger-bar');
+                const happinessBar = document.getElementById('happiness-bar');
+                const energyBar = document.getElementById('energy-bar');
+                const growthBar = document.getElementById('growth-bar');
+                
+                hungerBar.style.width = this.hunger + '%';
+                happinessBar.style.width = this.happiness + '%';
+                energyBar.style.width = this.energy + '%';
+                growthBar.style.width = this.growth + '%';
+                
+                // Update ARIA attributes for screen readers
+                hungerBar.parentElement.setAttribute('aria-valuenow', this.hunger);
+                happinessBar.parentElement.setAttribute('aria-valuenow', this.happiness);
+                energyBar.parentElement.setAttribute('aria-valuenow', this.energy);
+                growthBar.parentElement.setAttribute('aria-valuenow', this.growth);
+                
+                this.updateHappinessGlow();
+            }
+            
+            updateGrowthStage() {
+                const stage = Math.floor(this.growth / 25);
+                this.growthStage = Math.min(stage, this.growthStages.length - 1);
+                document.getElementById('growth-stage').textContent = this.growthStages[this.growthStage];
+                
+                // Update cat size based on growth stage
+                const catSvg = document.querySelector('.cat-svg');
+                const baseSize = 200;
+                const growthMultiplier = 1 + (this.growthStage * 0.2);
+                catSvg.style.width = (baseSize * growthMultiplier) + 'px';
+                catSvg.style.height = (baseSize * growthMultiplier) + 'px';
+            }
+            
+            showMessage(text) {
+                const messageEl = document.getElementById('message');
+                messageEl.textContent = text;
+                messageEl.classList.add('show');
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 3000);
+            }
+            
+            playSound(type) {
+                this.playCatSound(type);
+            }
+            
+            feedCat() {
+                if (this.hunger < 100) {
+                    const breed = this.breeds[this.breed];
+                    const mood = this.moods[this.mood];
+                    
+                    this.hunger = Math.min(100, this.hunger + 30);
+                    this.happiness = Math.min(100, this.happiness + 10 * mood.happinessMultiplier);
+                    this.energy = Math.min(100, this.energy + 15);
+                    this.growth += 5;
+                    this.addXP(10);
+                    
+                    this.showMessage("Yum! Thank you for the food! 😋");
+                    this.updateStatusBars();
+                    this.updateGrowthStage();
+                    this.animateCat('bounce');
+                    this.playSound('meow');
+                } else {
+                    this.showMessage("I'm not hungry right now! 😊");
+                }
+            }
+            
+            playWithCat() {
+                if (this.energy > 20) {
+                    const breed = this.breeds[this.breed];
+                    const mood = this.moods[this.mood];
+                    
+                    this.happiness = Math.min(100, this.happiness + 25 * mood.happinessMultiplier);
+                    this.energy = Math.max(0, this.energy - 20 * breed.energyMultiplier);
+                    this.growth += 3;
+                    this.addXP(15);
+                    
+                    this.showMessage("Wheee! This is so much fun! 🎾");
+                    this.updateStatusBars();
+                    this.updateGrowthStage();
+                    this.animateCat('bounce');
+                    this.playSound('meow');
+                } else {
+                    this.showMessage("I'm too tired to play right now... 😴");
+                }
+            }
+            
+            petCat() {
+                const mood = this.moods[this.mood];
+                this.happiness = Math.min(100, this.happiness + 15 * mood.happinessMultiplier);
+                this.energy = Math.min(100, this.energy + 5);
+                
+                this.showMessage("Purr purr... I love your pets! ❤️");
+                this.updateStatusBars();
+                this.animateCat('stretch');
+                this.playSound('purr');
+                this.createFloatingHearts();
+            }
+            
+            trainCat() {
+                if (this.energy > 30 && this.happiness > 50) {
+                    const breed = this.breeds[this.breed];
+                    const mood = this.moods[this.mood];
+                    
+                    this.growth += 8;
+                    this.happiness = Math.min(100, this.happiness + 10 * mood.happinessMultiplier);
+                    this.energy = Math.max(0, this.energy - 25 * breed.energyMultiplier);
+                    
+                    this.showMessage("I learned something new! I'm getting smarter! 🎯");
+                    this.updateStatusBars();
+                    this.updateGrowthStage();
+                    this.animateCat('bounce');
+                    this.playSound('meow');
+                } else {
+                    this.showMessage("I'm too tired or not happy enough to train right now... 😴");
+                }
+            }
+            
+            completeTask(taskText) {
+                this.growth += 10;
+                this.happiness += 15;
+                this.hunger = Math.max(0, this.hunger - 5);
+                this.taskCount++;
+                this.addXP(25);
+                this.showMessage("You completed a task! I'm growing stronger! 🌱");
+                this.updateStatusBars();
+                this.updateGrowthStage();
+                this.animateCat('bounce');
+                this.playSound('achievement');
+                this.createCelebrationParticles();
+                this.createSparkles();
+                this.checkAchievements();
+            }
+            
+            animateCat(animation) {
+                const cat = document.getElementById('cat');
+                cat.classList.remove('bounce', 'sleep', 'stretch');
+                cat.classList.add(animation);
+                
+                setTimeout(() => {
+                    cat.classList.remove(animation);
+                }, animation === 'sleep' ? 2000 : 500);
+            }
+            
+            createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 3 + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            createCelebrationParticles() {
+                const cat = document.getElementById('cat');
+                const rect = cat.getBoundingClientRect();
+                
+                for (let i = 0; i < 10; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.position = 'fixed';
+                    particle.style.left = (rect.left + rect.width / 2) + 'px';
+                    particle.style.top = (rect.top + rect.height / 2) + 'px';
+                    particle.style.animation = 'particle-float 2s ease-out forwards';
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 2000);
+                }
+            }
+            
+            updateAccessories() {
+                const collar = document.getElementById('cat-collar');
+                const hat = document.getElementById('cat-hat');
+                
+                if (this.accessories.collar) {
+                    collar.classList.add('show');
+                } else {
+                    collar.classList.remove('show');
+                }
+                
+                if (this.accessories.hat) {
+                    hat.classList.add('show');
+                } else {
+                    hat.classList.remove('show');
+                }
+            }
+            
+            toggleAccessories() {
+                if (this.growth >= 25) {
+                    this.accessories.collar = !this.accessories.collar;
+                    if (this.growth >= 50) {
+                        this.accessories.hat = !this.accessories.hat;
+                    }
+                    this.updateAccessories();
+                    localStorage.setItem('catAccessories', JSON.stringify(this.accessories));
+                    this.showMessage(this.accessories.collar ? "I got a new collar! 🎀" : "Collar removed!");
+                } else {
+                    this.showMessage("I need to grow more to wear accessories! 🌱");
+                }
+            }
+            
+            checkAchievements() {
+                const newAchievements = [];
+                
+                // First task completed
+                if (this.taskCount === 1 && !this.achievements.includes('First Task')) {
+                    newAchievements.push('First Task');
+                }
+                
+                // 5 tasks completed
+                if (this.taskCount >= 5 && !this.achievements.includes('Task Master')) {
+                    newAchievements.push('Task Master');
+                }
+                
+                // 10 tasks completed
+                if (this.taskCount >= 10 && !this.achievements.includes('Productivity Pro')) {
+                    newAchievements.push('Productivity Pro');
+                }
+                
+                // Cat reached adult stage
+                if (this.growthStage >= 2 && !this.achievements.includes('Adult Cat')) {
+                    newAchievements.push('Adult Cat');
+                }
+                
+                // Perfect happiness
+                if (this.happiness >= 100 && !this.achievements.includes('Happy Cat')) {
+                    newAchievements.push('Happy Cat');
+                }
+                
+                // Add new achievements
+                newAchievements.forEach(achievement => {
+                    this.achievements.push(achievement);
+                    this.showMessage(`🏆 Achievement Unlocked: ${achievement}!`);
+                    this.playSound('achievement');
+                });
+                
+                if (newAchievements.length > 0) {
+                    localStorage.setItem('catAchievements', JSON.stringify(this.achievements));
+                    this.renderAchievements();
+                }
+            }
+            
+            renderAchievements() {
+                const panel = document.getElementById('achievements-panel');
+                const list = document.getElementById('achievements-list');
+                
+                if (this.achievements.length > 0) {
+                    panel.style.display = 'block';
+                    list.innerHTML = '';
+                    
+                    this.achievements.forEach(achievement => {
+                        const badge = document.createElement('div');
+                        badge.className = 'achievement';
+                        badge.textContent = achievement;
+                        list.appendChild(badge);
+                    });
+                } else {
+                    panel.style.display = 'none';
+                }
+            }
+            
+            createFloatingHearts() {
+                const cat = document.getElementById('cat');
+                const rect = cat.getBoundingClientRect();
+                
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'floating-heart';
+                        heart.innerHTML = '❤️';
+                        heart.style.position = 'fixed';
+                        heart.style.left = (rect.left + rect.width / 2 + (Math.random() - 0.5) * 100) + 'px';
+                        heart.style.top = (rect.top + rect.height / 2) + 'px';
+                        document.body.appendChild(heart);
+                        
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 3000);
+                    }, i * 100);
+                }
+            }
+            
+            createSparkles() {
+                const todoList = document.querySelector('.todo-list');
+                const rect = todoList.getBoundingClientRect();
+                
+                for (let i = 0; i < 12; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        sparkle.style.position = 'fixed';
+                        sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                        sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+                        document.body.appendChild(sparkle);
+                        
+                        setTimeout(() => {
+                            sparkle.remove();
+                        }, 1500);
+                    }, i * 50);
+                }
+            }
+            
+            updateHappinessGlow() {
+                const petSection = document.querySelector('.pet-section');
+                petSection.classList.remove('happy', 'very-happy');
+                
+                if (this.happiness >= 80) {
+                    petSection.classList.add('very-happy');
+                } else if (this.happiness >= 60) {
+                    petSection.classList.add('happy');
+                }
+            }
+            
+            updateBreedInfo() {
+                const breedName = document.getElementById('breed-name');
+                const moodIndicator = document.getElementById('mood-indicator');
+                
+                breedName.textContent = this.breeds[this.breed].name;
+                moodIndicator.textContent = this.mood.charAt(0).toUpperCase() + this.mood.slice(1);
+            }
+            
+            updateSeasonalAccessories() {
+                const seasonalHat = document.getElementById('seasonal-hat');
+                const currentMonth = new Date().getMonth();
+                const currentHour = new Date().getHours();
+                
+                seasonalHat.innerHTML = '';
+                
+                // December - Santa hat
+                if (currentMonth === 11) {
+                    seasonalHat.innerHTML = '<div class="santa-hat"></div>';
+                    seasonalHat.classList.add('show');
+                }
+                // Summer months (June-August) during day - Sunglasses
+                else if ((currentMonth >= 5 && currentMonth <= 7) && (currentHour >= 8 && currentHour <= 18)) {
+                    seasonalHat.innerHTML = '<div class="sunglasses"></div>';
+                    seasonalHat.classList.add('show');
+                }
+                else {
+                    seasonalHat.classList.remove('show');
+                }
+            }
+            
+            updateTimeBasedMood() {
+                const currentHour = new Date().getHours();
+                
+                // Night time (10 PM - 6 AM) - sleepy
+                if (currentHour >= 22 || currentHour <= 6) {
+                    this.mood = 'sleepy';
+                }
+                // Morning (6 AM - 10 AM) - excited
+                else if (currentHour >= 6 && currentHour <= 10) {
+                    this.mood = 'excited';
+                }
+                // Afternoon (10 AM - 6 PM) - content
+                else if (currentHour >= 10 && currentHour <= 18) {
+                    this.mood = 'content';
+                }
+                // Evening (6 PM - 10 PM) - playful
+                else {
+                    this.mood = 'playful';
+                }
+                
+                this.updateBreedInfo();
+                this.updateIdleAnimation();
+            }
+            
+            startIdleAnimations() {
+                setInterval(() => {
+                    this.idleTimer++;
+                    
+                    // Change idle animation every 10 seconds
+                    if (this.idleTimer % 10 === 0) {
+                        this.updateIdleAnimation();
+                    }
+                    
+                    // Update time-based mood every minute
+                    if (this.idleTimer % 60 === 0) {
+                        this.updateTimeBasedMood();
+                    }
+                }, 1000);
+            }
+            
+            updateIdleAnimation() {
+                const cat = document.getElementById('cat');
+                const currentBreed = this.breeds[this.breed];
+                const currentMood = this.moods[this.mood];
+                
+                // Remove all idle animation classes
+                cat.classList.remove('tail_swish', 'ear_twitch', 'tail_flick', 'paw_tap', 
+                                   'tail_wag', 'head_tilt', 'yawn', 'sleep', 'ear_flick', 
+                                   'turn_away', 'bounce');
+                
+                // Get available animations for current breed and mood
+                const breedAnimations = currentBreed.idleAnimations;
+                const moodAnimations = currentMood.idleAnimations;
+                const allAnimations = [...breedAnimations, ...moodAnimations];
+                
+                // Select random animation
+                const randomAnimation = allAnimations[Math.floor(Math.random() * allAnimations.length)];
+                cat.classList.add(randomAnimation);
+                
+                this.currentIdleAnimation = randomAnimation;
+            }
+            
+            changeBreed() {
+                const breeds = Object.keys(this.breeds);
+                const currentIndex = breeds.indexOf(this.breed);
+                const nextIndex = (currentIndex + 1) % breeds.length;
+                this.breed = breeds[nextIndex];
+                
+                // Update messages based on new breed
+                this.messages = this.breeds[this.breed].messages;
+                
+                // Save breed preference
+                localStorage.setItem('catBreed', this.breed);
+                
+                // Update display
+                this.updateBreedInfo();
+                this.updateIdleAnimation();
+                
+                this.showMessage(`I'm now a ${this.breeds[this.breed].name}! ${this.breeds[this.breed].personality === 'calm' ? '😌' : this.breeds[this.breed].personality === 'vocal' ? '🗣️' : '💖'}`);
+            }
+            
+            startDecay() {
+                setInterval(() => {
+                    const breed = this.breeds[this.breed];
+                    const mood = this.moods[this.mood];
+                    
+                    this.hunger = Math.max(0, this.hunger - 1 * breed.hungerRate);
+                    this.happiness = Math.max(0, this.happiness - 0.5 * mood.happinessMultiplier);
+                    this.energy = Math.max(0, this.energy - 0.3);
+                    this.updateStatusBars();
+                    
+                    if (this.hunger < 20) {
+                        this.showMessage("I'm getting hungry... 😿");
+                    }
+                    if (this.happiness < 20) {
+                        this.showMessage("I'm feeling sad... 😢");
+                    }
+                    if (this.energy < 20) {
+                        this.showMessage("I'm getting tired... 😴");
+                    }
+                }, 10000); // Decay every 10 seconds
+            }
+            
+            setupCatInteraction() {
+                const cat = document.getElementById('cat');
+                cat.addEventListener('click', () => {
+                    const randomMessage = this.messages[Math.floor(Math.random() * this.messages.length)];
+                    this.showMessage(randomMessage);
+                    this.happiness += 5;
+                    this.updateStatusBars();
+                    this.animateCat('bounce');
+                    this.playSound('purr');
+                });
+            }
+            
+            // Todo List Methods
+            addTodo(text, priority = 'medium', dueDate = null, category = 'personal') {
+                if (text.trim()) {
+                    const todo = {
+                        id: Date.now(),
+                        text: text.trim(),
+                        completed: false,
+                        priority: priority,
+                        dueDate: dueDate,
+                        category: category,
+                        createdAt: new Date().toISOString()
+                    };
+                    this.todos.push(todo);
+                    this.saveTodos();
+                    this.renderTodos();
+                    this.updateProgressChart();
+                    this.showMessage("New task added! 📝");
+                }
+            }
+            
+            toggleTodo(id) {
+                const todo = this.todos.find(t => t.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    if (todo.completed) {
+                        this.completeTask(todo.text);
+                    }
+                    this.saveTodos();
+                    this.renderTodos();
+                    this.updateProgressChart();
+                }
+            }
+            
+            deleteTodo(id) {
+                this.todos = this.todos.filter(t => t.id !== id);
+                this.saveTodos();
+                this.renderTodos();
+                this.updateProgressChart();
+            }
+            
+            renderTodos() {
+                const todoList = document.getElementById('todo-list');
+                todoList.innerHTML = '';
+                
+                this.todos.forEach(todo => {
+                    const todoItem = document.createElement('div');
+                    todoItem.className = `todo-item ${todo.completed ? 'completed' : ''} priority-${todo.priority}`;
+                    todoItem.draggable = true;
+                    todoItem.dataset.id = todo.id;
+                    
+                    // Check if overdue
+                    const isOverdue = todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed;
+                    if (isOverdue) {
+                        todoItem.classList.add('overdue');
+                    }
+                    
+                    const dueDateText = todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : '';
+                    const isOverdueText = isOverdue ? ' (OVERDUE)' : '';
+                    
+                    todoItem.innerHTML = `
+                        <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} onchange="catPet.toggleTodo(${todo.id})">
+                        <span class="todo-text">${todo.text}</span>
+                        <div class="todo-details">
+                            <span class="priority-badge ${todo.priority}">${todo.priority.toUpperCase()}</span>
+                            <span class="category-badge">${todo.category}</span>
+                            ${dueDateText ? `<span class="due-date ${isOverdue ? 'overdue' : ''}">📅 ${dueDateText}${isOverdueText}</span>` : ''}
+                        </div>
+                        <button class="delete-btn" onclick="catPet.deleteTodo(${todo.id})">🗑️</button>
+                    `;
+                    
+                    // Add drag and drop event listeners
+                    todoItem.addEventListener('dragstart', this.handleDragStart.bind(this));
+                    todoItem.addEventListener('dragover', this.handleDragOver.bind(this));
+                    todoItem.addEventListener('drop', this.handleDrop.bind(this));
+                    
+                    todoList.appendChild(todoItem);
+                });
+                
+                this.updateProgressChart();
+            }
+            
+            saveTodos() {
+                localStorage.setItem('catTodos', JSON.stringify(this.todos));
+            }
+            
+            updateProgressChart() {
+                const totalTasks = this.todos.length;
+                const completedTasks = this.todos.filter(t => t.completed).length;
+                const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+                const overdueTasks = this.todos.filter(t => t.dueDate && new Date(t.dueDate) < new Date() && !t.completed).length;
+                
+                document.getElementById('total-tasks').textContent = totalTasks;
+                document.getElementById('completed-tasks').textContent = completedTasks;
+                document.getElementById('completion-rate').textContent = completionRate + '%';
+                document.getElementById('overdue-tasks').textContent = overdueTasks;
+            }
+            
+            // Drag and Drop Methods
+            handleDragStart(e) {
+                e.dataTransfer.setData('text/plain', e.target.dataset.id);
+                e.target.classList.add('dragging');
+            }
+            
+            handleDragOver(e) {
+                e.preventDefault();
+            }
+            
+            handleDrop(e) {
+                e.preventDefault();
+                const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                const dropTarget = e.target.closest('.todo-item');
+                
+                if (dropTarget && dropTarget.dataset.id !== draggedId.toString()) {
+                    const draggedIndex = this.todos.findIndex(t => t.id === draggedId);
+                    const dropIndex = this.todos.findIndex(t => t.id === parseInt(dropTarget.dataset.id));
+                    
+                    if (draggedIndex !== -1 && dropIndex !== -1) {
+                        const [draggedTodo] = this.todos.splice(draggedIndex, 1);
+                        this.todos.splice(dropIndex, 0, draggedTodo);
+                        this.saveTodos();
+                        this.renderTodos();
+                    }
+                }
+                
+                document.querySelectorAll('.todo-item').forEach(item => {
+                    item.classList.remove('dragging');
+                });
+            }
+            
+            // Bulk Actions
+            markAllComplete() {
+                this.todos.forEach(todo => {
+                    if (!todo.completed) {
+                        todo.completed = true;
+                        this.completeTask(todo.text);
+                    }
+                });
+                this.saveTodos();
+                this.renderTodos();
+                this.showMessage("All tasks completed! 🎉");
+            }
+            
+            deleteCompleted() {
+                const completedCount = this.todos.filter(t => t.completed).length;
+                this.todos = this.todos.filter(t => !t.completed);
+                this.saveTodos();
+                this.renderTodos();
+                this.showMessage(`Deleted ${completedCount} completed tasks! 🗑️`);
+            }
+            
+            sortByPriority() {
+                const priorityOrder = { high: 3, medium: 2, low: 1 };
+                this.todos.sort((a, b) => {
+                    if (a.completed !== b.completed) {
+                        return a.completed ? 1 : -1;
+                    }
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                });
+                this.saveTodos();
+                this.renderTodos();
+                this.showMessage("Tasks sorted by priority! 📊");
+            }
+            
+            addTemplate() {
+                const templates = [
+                    { text: "Morning Exercise", priority: "high", category: "health", dueDate: this.getTomorrowDate() },
+                    { text: "Read 30 minutes", priority: "medium", category: "learning", dueDate: this.getTomorrowDate() },
+                    { text: "Clean workspace", priority: "low", category: "chores", dueDate: this.getTomorrowDate() },
+                    { text: "Review weekly goals", priority: "high", category: "work", dueDate: this.getTomorrowDate() },
+                    { text: "Call family", priority: "medium", category: "personal", dueDate: this.getTomorrowDate() }
+                ];
+                
+                const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+                this.addTodo(randomTemplate.text, randomTemplate.priority, randomTemplate.dueDate, randomTemplate.category);
+            }
+            
+            getTomorrowDate() {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                return tomorrow.toISOString().split('T')[0];
+            }
+            
+            // Gamification Methods
+            addXP(amount) {
+                this.xp += amount;
+                localStorage.setItem('catXP', this.xp.toString());
+                
+                if (this.xp >= this.xpToNextLevel) {
+                    this.levelUp();
+                }
+                
+                this.updateXPBar();
+            }
+            
+            calculateXPToNextLevel() {
+                return this.level * 100; // 100 XP per level
+            }
+            
+            levelUp() {
+                this.level++;
+                this.xpToNextLevel = this.calculateXPToNextLevel();
+                localStorage.setItem('catLevel', this.level.toString());
+                
+                this.showLevelUp();
+                this.unlockNewFeatures();
+            }
+            
+            showLevelUp() {
+                const levelUpDiv = document.createElement('div');
+                levelUpDiv.className = 'level-up';
+                levelUpDiv.textContent = `🎉 Level ${this.level}! 🎉`;
+                document.body.appendChild(levelUpDiv);
+                
+                setTimeout(() => {
+                    levelUpDiv.remove();
+                }, 2000);
+            }
+            
+            unlockNewFeatures() {
+                if (this.level >= 5 && !this.unlockedRooms.includes('bedroom')) {
+                    this.unlockedRooms.push('bedroom');
+                    this.showMessage('🏠 Bedroom unlocked!');
+                }
+                if (this.level >= 10 && !this.unlockedRooms.includes('kitchen')) {
+                    this.unlockedRooms.push('kitchen');
+                    this.showMessage('🍳 Kitchen unlocked!');
+                }
+                if (this.level >= 15 && !this.unlockedRooms.includes('garden')) {
+                    this.unlockedRooms.push('garden');
+                    this.showMessage('🌺 Garden unlocked!');
+                }
+                
+                localStorage.setItem('unlockedRooms', JSON.stringify(this.unlockedRooms));
+            }
+            
+            updateXPBar() {
+                const xpFill = document.getElementById('xp-fill');
+                const levelDisplay = document.getElementById('level-display');
+                const xpPercentage = (this.xp / this.xpToNextLevel) * 100;
+                
+                xpFill.style.width = xpPercentage + '%';
+                levelDisplay.textContent = `Level ${this.level}`;
+            }
+            
+            // Environment Methods
+            getCurrentSeason() {
+                const month = new Date().getMonth();
+                if (month >= 2 && month <= 4) return 'spring';
+                if (month >= 5 && month <= 7) return 'summer';
+                if (month >= 8 && month <= 10) return 'autumn';
+                return 'winter';
+            }
+            
+            getCurrentTime() {
+                const hour = new Date().getHours();
+                if (hour >= 6 && hour <= 18) return 'day';
+                return 'night';
+            }
+            
+            updateEnvironment() {
+                // Update body classes for themes
+                document.body.className = '';
+                document.body.classList.add(this.currentSeason, this.currentTime);
+                
+                // Update weather
+                this.updateWeather();
+                
+                // Update background elements
+                this.updateBackgroundElements();
+                
+                // Update cat mood based on weather
+                this.updateWeatherMood();
+            }
+            
+            updateWeather() {
+                const weatherContainer = document.getElementById('weather-container');
+                weatherContainer.innerHTML = '';
+                
+                if (this.currentWeather === 'rainy') {
+                    this.createRain();
+                } else if (this.currentWeather === 'snowy') {
+                    this.createSnow();
+                } else if (this.currentWeather === 'sunny') {
+                    this.createSunshine();
+                }
+            }
+            
+            createRain() {
+                const weatherContainer = document.getElementById('weather-container');
+                for (let i = 0; i < 50; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'rain-drop';
+                    drop.style.left = Math.random() * 100 + '%';
+                    drop.style.animationDelay = Math.random() * 2 + 's';
+                    weatherContainer.appendChild(drop);
+                }
+            }
+            
+            createSnow() {
+                const weatherContainer = document.getElementById('weather-container');
+                for (let i = 0; i < 30; i++) {
+                    const flake = document.createElement('div');
+                    flake.className = 'snow-flake';
+                    flake.style.left = Math.random() * 100 + '%';
+                    flake.style.animationDelay = Math.random() * 3 + 's';
+                    weatherContainer.appendChild(flake);
+                }
+            }
+            
+            createSunshine() {
+                const weatherContainer = document.getElementById('weather-container');
+                for (let i = 0; i < 8; i++) {
+                    const ray = document.createElement('div');
+                    ray.className = 'sun-ray';
+                    ray.style.left = (Math.random() * 80 + 10) + '%';
+                    ray.style.top = (Math.random() * 60 + 20) + '%';
+                    ray.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    ray.style.animationDelay = Math.random() * 2 + 's';
+                    weatherContainer.appendChild(ray);
+                }
+            }
+            
+            updateBackgroundElements() {
+                // Remove existing elements
+                document.querySelectorAll('.background-element').forEach(el => el.remove());
+                
+                // Add new elements based on room and season
+                if (this.currentRoom === 'garden') {
+                    this.createGardenElements();
+                } else if (this.currentRoom === 'bedroom') {
+                    this.createBedroomElements();
+                } else if (this.currentRoom === 'kitchen') {
+                    this.createKitchenElements();
+                }
+            }
+            
+            createGardenElements() {
+                // Add trees
+                for (let i = 0; i < 3; i++) {
+                    const tree = document.createElement('div');
+                    tree.className = 'background-element tree';
+                    tree.style.left = (20 + i * 30) + '%';
+                    tree.style.bottom = '10%';
+                    tree.onclick = () => this.interactWithElement('tree');
+                    document.body.appendChild(tree);
+                }
+                
+                // Add clouds
+                for (let i = 0; i < 2; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'background-element cloud';
+                    cloud.style.left = (10 + i * 40) + '%';
+                    cloud.style.top = '10%';
+                    cloud.onclick = () => this.interactWithElement('cloud');
+                    document.body.appendChild(cloud);
+                }
+            }
+            
+            createBedroomElements() {
+                // Add cozy elements
+                const cozyElements = ['🛏️', '🪑', '🪞', '🕯️'];
+                cozyElements.forEach((element, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'background-element';
+                    el.textContent = element;
+                    el.style.fontSize = '2rem';
+                    el.style.left = (15 + index * 20) + '%';
+                    el.style.top = '20%';
+                    el.onclick = () => this.interactWithElement('bedroom');
+                    document.body.appendChild(el);
+                });
+            }
+            
+            createKitchenElements() {
+                // Add kitchen elements
+                const kitchenElements = ['🍳', '🍽️', '☕', '🍰'];
+                kitchenElements.forEach((element, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'background-element';
+                    el.textContent = element;
+                    el.style.fontSize = '2rem';
+                    el.style.left = (15 + index * 20) + '%';
+                    el.style.top = '20%';
+                    el.onclick = () => this.interactWithElement('kitchen');
+                    document.body.appendChild(el);
+                });
+            }
+            
+            interactWithElement(elementType) {
+                this.addXP(5);
+                this.happiness = Math.min(100, this.happiness + 10);
+                this.updateStatusBars();
+                
+                const messages = {
+                    'tree': 'I love climbing trees! 🌳',
+                    'cloud': 'The clouds are so fluffy! ☁️',
+                    'bedroom': 'This room is so cozy! 🏠',
+                    'kitchen': 'I smell something delicious! 👃'
+                };
+                
+                this.showMessage(messages[elementType] || 'I love exploring! 🐱');
+            }
+            
+            updateWeatherMood() {
+                const weatherEffect = this.weatherPatterns[this.currentWeather].moodEffect;
+                this.happiness = Math.min(100, this.happiness * weatherEffect);
+                this.updateStatusBars();
+            }
+            
+            changeWeather() {
+                const weathers = ['clear', 'rainy', 'snowy', 'sunny'];
+                const currentIndex = weathers.indexOf(this.currentWeather);
+                this.currentWeather = weathers[(currentIndex + 1) % weathers.length];
+                this.updateEnvironment();
+                this.showMessage(`Weather changed to ${this.currentWeather}! ${this.currentWeather === 'rainy' ? '🌧️' : this.currentWeather === 'snowy' ? '❄️' : this.currentWeather === 'sunny' ? '☀️' : '🌤️'}`);
+            }
+            
+            changeRoom() {
+                const roomIndex = this.unlockedRooms.indexOf(this.currentRoom);
+                const nextIndex = (roomIndex + 1) % this.unlockedRooms.length;
+                this.currentRoom = this.unlockedRooms[nextIndex];
+                localStorage.setItem('currentRoom', this.currentRoom);
+                this.updateEnvironment();
+                this.showMessage(`Moved to ${this.currentRoom}! 🏠`);
+            }
+            
+            // Audio System Methods
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.setupBackgroundMusic();
+                    this.createAudioControls();
+                } catch (error) {
+                    console.log('Audio not supported:', error);
+                }
+            }
+            
+            setupBackgroundMusic() {
+                if (!this.audioContext) return;
+                
+                // Create background music based on cat mood
+                this.updateBackgroundMusic();
+            }
+            
+            updateBackgroundMusic() {
+                if (!this.musicEnabled) return;
+                
+                const mood = this.getMoodForMusic();
+                const track = this.musicTracks[mood];
+                
+                // Generate mood-appropriate music
+                this.generateMoodMusic(mood);
+            }
+            
+            getMoodForMusic() {
+                if (this.happiness > 80) return 'happy';
+                if (this.happiness > 60) return 'playful';
+                if (this.happiness > 40) return 'calm';
+                return 'sleepy';
+            }
+            
+            generateMoodMusic(mood) {
+                if (!this.audioContext) return;
+                
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                // Different frequencies for different moods
+                const frequencies = {
+                    happy: [523, 659, 784, 1047], // C major scale
+                    playful: [440, 554, 659, 880], // A major scale
+                    calm: [261, 329, 392, 523], // C minor scale
+                    sleepy: [196, 246, 293, 349] // Low frequencies
+                };
+                
+                const freq = frequencies[mood];
+                let currentFreq = 0;
+                
+                oscillator.frequency.setValueAtTime(freq[currentFreq], this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(this.volume * 0.1, this.audioContext.currentTime);
+                
+                oscillator.start();
+                
+                // Change frequency every 2 seconds
+                setInterval(() => {
+                    currentFreq = (currentFreq + 1) % freq.length;
+                    oscillator.frequency.setValueAtTime(freq[currentFreq], this.audioContext.currentTime);
+                }, 2000);
+                
+                this.backgroundMusic = { oscillator, gainNode };
+            }
+            
+            playCatSound(type) {
+                if (!this.soundEnabled || !this.audioContext) return;
+                
+                const sounds = this.catSounds[type];
+                const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+                
+                this.generateCatSound(randomSound, type);
+            }
+            
+            generateCatSound(soundName, type) {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                const soundParams = {
+                    meow1: { freq: 800, duration: 0.3, type: 'sine' },
+                    meow2: { freq: 600, duration: 0.4, type: 'sawtooth' },
+                    meow3: { freq: 700, duration: 0.35, type: 'triangle' },
+                    meow4: { freq: 900, duration: 0.25, type: 'sine' },
+                    purr1: { freq: 120, duration: 1.0, type: 'sine' },
+                    purr2: { freq: 140, duration: 0.8, type: 'triangle' },
+                    purr3: { freq: 100, duration: 1.2, type: 'sine' },
+                    chirp1: { freq: 1200, duration: 0.2, type: 'sine' },
+                    chirp2: { freq: 1000, duration: 0.15, type: 'triangle' },
+                    achievement1: { freq: [523, 659, 784], duration: 0.5, type: 'sine' },
+                    achievement2: { freq: [784, 659, 523], duration: 0.5, type: 'triangle' }
+                };
+                
+                const params = soundParams[soundName];
+                if (!params) return;
+                
+                oscillator.type = params.type;
+                
+                if (Array.isArray(params.freq)) {
+                    // Play sequence of frequencies
+                    params.freq.forEach((freq, index) => {
+                        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * 0.1);
+                    });
+                } else {
+                    oscillator.frequency.setValueAtTime(params.freq, this.audioContext.currentTime);
+                }
+                
+                gainNode.gain.setValueAtTime(this.volume * 0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + params.duration);
+                
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + params.duration);
+            }
+            
+            createAudioControls() {
+                const audioPanel = document.createElement('div');
+                audioPanel.className = 'audio-panel';
+                audioPanel.id = 'audio-panel';
+                audioPanel.innerHTML = `
+                    <button class="close-btn" onclick="hideAudioPanel()" aria-label="Close audio settings">×</button>
+                    <div class="audio-controls">
+                        <button class="audio-btn" onclick="toggleSound()">🔊</button>
+                        <button class="audio-btn" onclick="toggleMusic()">🎵</button>
+                        <input type="range" min="0" max="1" step="0.1" value="${this.volume}" 
+                               onchange="changeVolume(this.value)" class="volume-slider">
+                    </div>
+                `;
+                document.body.appendChild(audioPanel);
+            }
+            
+            toggleSound() {
+                this.soundEnabled = !this.soundEnabled;
+                localStorage.setItem('soundEnabled', this.soundEnabled);
+                this.updateAudioControls();
+            }
+            
+            toggleMusic() {
+                this.musicEnabled = !this.musicEnabled;
+                localStorage.setItem('musicEnabled', this.musicEnabled);
+                this.updateAudioControls();
+                this.updateBackgroundMusic();
+            }
+            
+            changeVolume(value) {
+                this.volume = parseFloat(value);
+                localStorage.setItem('volume', this.volume);
+                if (this.backgroundMusic) {
+                    this.backgroundMusic.gainNode.gain.setValueAtTime(this.volume * 0.1, this.audioContext.currentTime);
+                }
+            }
+            
+            updateAudioControls() {
+                const soundBtn = document.querySelector('.audio-btn');
+                const musicBtn = document.querySelectorAll('.audio-btn')[1];
+                
+                soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+                musicBtn.textContent = this.musicEnabled ? '🎵' : '🔇';
+            }
+            
+            // PWA Methods
+            initPWA() {
+                this.registerServiceWorker();
+                this.setupInstallPrompt();
+                this.setupNotifications();
+                this.setupTouchGestures();
+                this.setupVoiceCommands();
+            }
+            
+            async registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/sw.js');
+                        console.log('SW registered: ', registration);
+                    } catch (registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    }
+                }
+            }
+            
+            setupInstallPrompt() {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.installPrompt = e;
+                    this.showInstallButton();
+                });
+            }
+            
+            showInstallButton() {
+                const installBtn = document.createElement('button');
+                installBtn.className = 'install-btn';
+                installBtn.textContent = '📱 Install App';
+                installBtn.onclick = () => this.installApp();
+                document.body.appendChild(installBtn);
+            }
+            
+            async installApp() {
+                if (this.installPrompt) {
+                    this.installPrompt.prompt();
+                    const { outcome } = await this.installPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        this.showMessage('App installed successfully! 🎉');
+                    }
+                    this.installPrompt = null;
+                }
+            }
+            
+            async setupNotifications() {
+                if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    this.notificationPermission = permission === 'granted';
+                    
+                    if (this.notificationPermission) {
+                        this.scheduleNotifications();
+                    }
+                }
+            }
+            
+            scheduleNotifications() {
+                // Schedule cat care reminders
+                setInterval(() => {
+                    if (this.hunger < 50 || this.happiness < 50) {
+                        this.sendNotification('Cat Care Reminder', 'Your cat needs attention! 🐱');
+                    }
+                }, 300000); // Every 5 minutes
+            }
+            
+            sendNotification(title, body) {
+                if (this.notificationPermission) {
+                    new Notification(title, {
+                        body: body,
+                        icon: '/icon-192x192.png',
+                        badge: '/icon-72x72.png'
+                    });
+                }
+            }
+            
+            setupTouchGestures() {
+                const petSection = document.querySelector('.pet-section');
+                let startX = 0;
+                let startY = 0;
+                
+                petSection.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                });
+                
+                petSection.addEventListener('touchend', (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+                    const deltaX = endX - startX;
+                    const deltaY = endY - startY;
+                    
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        if (deltaX > 50) {
+                            this.changeRoom(); // Swipe right
+                        } else if (deltaX < -50) {
+                            this.changeWeather(); // Swipe left
+                        }
+                    } else {
+                        if (deltaY > 50) {
+                            this.feedCat(); // Swipe down
+                        } else if (deltaY < -50) {
+                            this.playWithCat(); // Swipe up
+                        }
+                    }
+                });
+            }
+            
+            setupVoiceCommands() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = 'en-US';
+                    
+                    recognition.onresult = (event) => {
+                        const command = event.results[0][0].transcript.toLowerCase();
+                        this.processVoiceCommand(command);
+                    };
+                    
+                    // Start listening when voice button is pressed
+                    window.startVoiceRecognition = () => {
+                        recognition.start();
+                    };
+                }
+            }
+            
+            processVoiceCommand(command) {
+                if (command.includes('feed') || command.includes('food')) {
+                    this.feedCat();
+                } else if (command.includes('play') || command.includes('game')) {
+                    this.playWithCat();
+                } else if (command.includes('pet') || command.includes('stroke')) {
+                    this.petCat();
+                } else if (command.includes('train')) {
+                    this.trainCat();
+                } else if (command.includes('weather')) {
+                    this.changeWeather();
+                } else if (command.includes('room')) {
+                    this.changeRoom();
+                } else {
+                    this.showMessage(`I heard: "${command}" but I'm not sure what to do! 🐱`);
+                }
+            }
+            
+            // Accessibility Methods
+            initAccessibility() {
+                this.applyAccessibilitySettings();
+                this.setupKeyboardNavigation();
+                this.announceToScreenReader('Cat pet application loaded. Use the accessibility panel to customize your experience.');
+            }
+            
+            applyAccessibilitySettings() {
+                const body = document.body;
+                const container = document.querySelector('.container');
+                
+                // Apply high contrast
+                if (this.accessibilitySettings.highContrast) {
+                    body.classList.add('high-contrast');
+                } else {
+                    body.classList.remove('high-contrast');
+                }
+                
+                // Apply colorblind friendly
+                if (this.accessibilitySettings.colorblindFriendly) {
+                    body.classList.add('colorblind-friendly');
+                } else {
+                    body.classList.remove('colorblind-friendly');
+                }
+                
+                // Apply reduced motion
+                if (this.accessibilitySettings.reducedMotion) {
+                    body.classList.add('reduced-motion');
+                } else {
+                    body.classList.remove('reduced-motion');
+                }
+                
+                // Apply font size
+                body.classList.remove('font-small', 'font-medium', 'font-large', 'font-extra-large');
+                body.classList.add(`font-${this.accessibilitySettings.fontSize}`);
+                
+                // Apply theme
+                body.classList.remove('theme-sunset', 'theme-ocean', 'theme-forest', 'theme-midnight');
+                if (this.accessibilitySettings.theme !== 'default') {
+                    body.classList.add(`theme-${this.accessibilitySettings.theme}`);
+                }
+                
+                // Apply keyboard navigation
+                if (this.accessibilitySettings.keyboardNav) {
+                    body.classList.add('keyboard-nav');
+                } else {
+                    body.classList.remove('keyboard-nav');
+                }
+                
+                this.updateAccessibilityButtons();
+            }
+            
+            updateAccessibilityButtons() {
+                // Update button states
+                document.getElementById('high-contrast-btn').classList.toggle('active', this.accessibilitySettings.highContrast);
+                document.getElementById('colorblind-btn').classList.toggle('active', this.accessibilitySettings.colorblindFriendly);
+                document.getElementById('reduced-motion-btn').classList.toggle('active', this.accessibilitySettings.reducedMotion);
+                document.getElementById('keyboard-nav-btn').classList.toggle('active', this.accessibilitySettings.keyboardNav);
+                
+                // Update font size buttons
+                document.querySelectorAll('.font-size-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`font-${this.accessibilitySettings.fontSize}`).classList.add('active');
+                
+                // Update theme buttons
+                document.querySelectorAll('[id^="theme-"]').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`theme-${this.accessibilitySettings.theme}`).classList.add('active');
+            }
+            
+            setupKeyboardNavigation() {
+                const controls = document.querySelectorAll('.control-btn');
+                let currentIndex = 0;
+                
+                document.addEventListener('keydown', (e) => {
+                    if (!this.accessibilitySettings.keyboardNav) return;
+                    
+                    switch(e.key) {
+                        case 'Tab':
+                            // Let default tab behavior work
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            currentIndex = (currentIndex + 1) % controls.length;
+                            controls[currentIndex].focus();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            currentIndex = (currentIndex - 1 + controls.length) % controls.length;
+                            controls[currentIndex].focus();
+                            break;
+                        case 'Enter':
+                        case ' ':
+                            e.preventDefault();
+                            controls[currentIndex].click();
+                            break;
+                        case '1':
+                            e.preventDefault();
+                            this.feedCat();
+                            break;
+                        case '2':
+                            e.preventDefault();
+                            this.playWithCat();
+                            break;
+                        case '3':
+                            e.preventDefault();
+                            this.petCat();
+                            break;
+                        case '4':
+                            e.preventDefault();
+                            this.trainCat();
+                            break;
+                        case 'h':
+                        case 'H':
+                            e.preventDefault();
+                            this.toggleHighContrast();
+                            break;
+                        case 'c':
+                        case 'C':
+                            e.preventDefault();
+                            this.toggleColorblindFriendly();
+                            break;
+                        case 'r':
+                        case 'R':
+                            e.preventDefault();
+                            this.toggleReducedMotion();
+                            break;
+                    }
+                });
+            }
+            
+            announceToScreenReader(message) {
+                // Create a live region for screen reader announcements
+                let liveRegion = document.getElementById('live-region');
+                if (!liveRegion) {
+                    liveRegion = document.createElement('div');
+                    liveRegion.id = 'live-region';
+                    liveRegion.className = 'sr-only';
+                    liveRegion.setAttribute('aria-live', 'polite');
+                    liveRegion.setAttribute('aria-atomic', 'true');
+                    document.body.appendChild(liveRegion);
+                }
+                
+                liveRegion.textContent = message;
+                
+                // Clear the message after a short delay
+                setTimeout(() => {
+                    liveRegion.textContent = '';
+                }, 1000);
+            }
+            
+            toggleHighContrast() {
+                this.accessibilitySettings.highContrast = !this.accessibilitySettings.highContrast;
+                localStorage.setItem('highContrast', this.accessibilitySettings.highContrast);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`High contrast mode ${this.accessibilitySettings.highContrast ? 'enabled' : 'disabled'}`);
+            }
+            
+            toggleColorblindFriendly() {
+                this.accessibilitySettings.colorblindFriendly = !this.accessibilitySettings.colorblindFriendly;
+                localStorage.setItem('colorblindFriendly', this.accessibilitySettings.colorblindFriendly);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`Color blind friendly mode ${this.accessibilitySettings.colorblindFriendly ? 'enabled' : 'disabled'}`);
+            }
+            
+            toggleReducedMotion() {
+                this.accessibilitySettings.reducedMotion = !this.accessibilitySettings.reducedMotion;
+                localStorage.setItem('reducedMotion', this.accessibilitySettings.reducedMotion);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`Reduced motion ${this.accessibilitySettings.reducedMotion ? 'enabled' : 'disabled'}`);
+            }
+            
+            toggleKeyboardNav() {
+                this.accessibilitySettings.keyboardNav = !this.accessibilitySettings.keyboardNav;
+                localStorage.setItem('keyboardNav', this.accessibilitySettings.keyboardNav);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`Keyboard navigation ${this.accessibilitySettings.keyboardNav ? 'enabled' : 'disabled'}`);
+            }
+            
+            setFontSize(size) {
+                this.accessibilitySettings.fontSize = size;
+                localStorage.setItem('fontSize', size);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`Font size set to ${size}`);
+            }
+            
+            setTheme(theme) {
+                this.accessibilitySettings.theme = theme;
+                localStorage.setItem('theme', theme);
+                this.applyAccessibilitySettings();
+                this.announceToScreenReader(`Theme changed to ${theme}`);
+            }
+            
+            showAccessibilityPanel() {
+                const panel = document.getElementById('accessibility-panel');
+                if (panel) {
+                    panel.style.display = 'block';
+                }
+            }
+            
+            showAudioPanel() {
+                const panel = document.getElementById('audio-panel');
+                if (panel) {
+                    panel.style.display = 'block';
+                }
+            }
+        }
+        
+        // Initialize the cat pet when the page loads
+        let catPet;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clear any existing data to ensure fresh start
+            if (!localStorage.getItem('catName')) {
+                localStorage.removeItem('catName');
+                localStorage.removeItem('catTodos');
+            }
+            catPet = new CuteCatPet();
+            
+            // Handle URL parameters for PWA shortcuts
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            
+            if (action) {
+                setTimeout(() => {
+                    switch(action) {
+                        case 'feed':
+                            catPet.feedCat();
+                            break;
+                        case 'play':
+                            catPet.playWithCat();
+                            break;
+                    }
+                }, 1000);
+            }
+        });
+        
+        // Global functions for button interactions
+        function feedCat() {
+            catPet.feedCat();
+        }
+        
+        function playWithCat() {
+            catPet.playWithCat();
+        }
+        
+        function petCat() {
+            catPet.petCat();
+        }
+        
+        function trainCat() {
+            catPet.trainCat();
+        }
+        
+        function toggleAccessories() {
+            catPet.toggleAccessories();
+        }
+        
+        function changeBreed() {
+            catPet.changeBreed();
+        }
+        
+        function changeWeather() {
+            catPet.changeWeather();
+        }
+        
+        function changeRoom() {
+            catPet.changeRoom();
+        }
+        
+        function toggleSound() {
+            catPet.toggleSound();
+        }
+        
+        function toggleMusic() {
+            catPet.toggleMusic();
+        }
+        
+        function changeVolume(value) {
+            catPet.changeVolume(value);
+        }
+        
+        function startVoiceRecognition() {
+            catPet.startVoiceRecognition();
+        }
+        
+        // Accessibility Functions
+        function toggleHighContrast() {
+            catPet.toggleHighContrast();
+        }
+        
+        function toggleColorblindFriendly() {
+            catPet.toggleColorblindFriendly();
+        }
+        
+        function toggleReducedMotion() {
+            catPet.toggleReducedMotion();
+        }
+        
+        function toggleKeyboardNav() {
+            catPet.toggleKeyboardNav();
+        }
+        
+        function setFontSize(size) {
+            catPet.setFontSize(size);
+        }
+        
+        function setTheme(theme) {
+            catPet.setTheme(theme);
+        }
+        
+        function hideAccessibilityPanel() {
+            const panel = document.getElementById('accessibility-panel');
+            panel.style.display = 'none';
+        }
+        
+        function hideAudioPanel() {
+            const panel = document.getElementById('audio-panel');
+            panel.style.display = 'none';
+        }
+        
+        function showAccessibilityPanel() {
+            const panel = document.getElementById('accessibility-panel');
+            if (panel.style.display === 'none' || !panel.style.display) {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+        
+        function showAudioPanel() {
+            const panel = document.getElementById('audio-panel');
+            if (panel && (panel.style.display === 'none' || !panel.style.display)) {
+                panel.style.display = 'block';
+            } else if (panel) {
+                panel.style.display = 'none';
+            }
+        }
+        
+        function saveCatName() {
+            const nameInput = document.getElementById('name-input');
+            const name = nameInput.value.trim();
+            if (name) {
+                catPet.saveName(name);
+            } else {
+                alert('Please enter a name for your cat!');
+            }
+        }
+        
+        function resetCatName() {
+            catPet.catName = '';
+            localStorage.removeItem('catName');
+            document.getElementById('name-input-container').style.display = 'block';
+            document.getElementById('cat-name').style.display = 'none';
+            document.getElementById('name-input').value = '';
+            document.getElementById('name-input').focus();
+        }
+        
+        function editCatName() {
+            const currentName = catPet.catName;
+            const nameInput = document.getElementById('name-input');
+            const nameContainer = document.getElementById('name-input-container');
+            const nameDisplay = document.getElementById('cat-name');
+            
+            // Show input with current name
+            nameContainer.style.display = 'block';
+            nameDisplay.style.display = 'none';
+            nameInput.value = currentName;
+            nameInput.focus();
+            nameInput.select(); // Select all text for easy editing
+            
+            // Change button text
+            const saveBtn = document.querySelector('.save-name-btn');
+            saveBtn.textContent = 'Update Name';
+            saveBtn.onclick = updateCatName;
+        }
+        
+        function updateCatName() {
+            const nameInput = document.getElementById('name-input');
+            const name = nameInput.value.trim();
+            if (name) {
+                catPet.saveName(name);
+                // Reset button
+                const saveBtn = document.querySelector('.save-name-btn');
+                saveBtn.textContent = 'Save Name';
+                saveBtn.onclick = saveCatName;
+            } else {
+                alert('Please enter a name for your cat!');
+            }
+        }
+        
+        function handleNameKeyPress(event) {
+            if (event.key === 'Enter') {
+                const saveBtn = document.querySelector('.save-name-btn');
+                if (saveBtn.textContent === 'Update Name') {
+                    updateCatName();
+                } else {
+                    saveCatName();
+                }
+            }
+        }
+        
+        function showTodoInput() {
+            const form = document.getElementById('todo-form');
+            const input = document.getElementById('todo-input');
+            form.style.display = 'block';
+            input.focus();
+            
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('todo-due-date').value = tomorrow.toISOString().split('T')[0];
+        }
+        
+        function saveTodo() {
+            const input = document.getElementById('todo-input');
+            const priority = document.getElementById('todo-priority').value;
+            const dueDate = document.getElementById('todo-due-date').value;
+            const category = document.getElementById('todo-category').value;
+            
+            if (input.value.trim()) {
+                catPet.addTodo(input.value.trim(), priority, dueDate, category);
+                input.value = '';
+                document.getElementById('todo-form').style.display = 'none';
+            } else {
+                alert('Please enter a task!');
+            }
+        }
+        
+        function cancelTodo() {
+            document.getElementById('todo-input').value = '';
+            document.getElementById('todo-form').style.display = 'none';
+        }
+        
+        function markAllComplete() {
+            catPet.markAllComplete();
+        }
+        
+        function deleteCompleted() {
+            if (confirm('Are you sure you want to delete all completed tasks?')) {
+                catPet.deleteCompleted();
+            }
+        }
+        
+        function addTemplate() {
+            catPet.addTemplate();
+        }
+        
+        function sortByPriority() {
+            catPet.sortByPriority();
+        }
+    </script>
+</body>
+</html> 

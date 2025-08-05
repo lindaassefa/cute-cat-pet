@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gothic Raven - Digital Pet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: 
+                radial-gradient(ellipse at center, #1a0a1a 0%, #0a0a0a 70%),
+                linear-gradient(45deg, #0a0a0a 0%, #1a0a1a 25%, #2a1a2a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            font-family: 'Crimson Text', serif;
+            color: #d4af37;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+            filter: sepia(0.1) contrast(1.05) brightness(0.95);
+        }
+        
+        /* Enhanced vintage paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(160, 82, 45, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 60, 30, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 60% 30%, rgba(205, 133, 63, 0.08) 0%, transparent 50%),
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 69, 19, 0.03) 2px,
+                    rgba(139, 69, 19, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(139, 69, 19, 0.02) 3px,
+                    rgba(139, 69, 19, 0.02) 6px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Enhanced atmospheric dust particles */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.1), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.08), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.12), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.06), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.1), transparent),
+                radial-gradient(1px 1px at 200px 60px, rgba(212, 175, 55, 0.05), transparent),
+                radial-gradient(1px 1px at 240px 90px, rgba(212, 175, 55, 0.03), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: float 20s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(212, 175, 55, 0.3),
+                0 0 40px rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+            position: absolute;
+            top: 2rem;
+            z-index: 10;
+            background: linear-gradient(45deg, #d4af37, #f4e4bc, #d4af37);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        .raven-scene {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .perch {
+            position: absolute;
+            z-index: 3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .perch:hover {
+            filter: brightness(1.2);
+        }
+        
+        .perch.active {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+        
+        .pallas-bust {
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 300px;
+            background: 
+                linear-gradient(45deg, #8b4513, #a0522d, #8b4513),
+                radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 0, 0, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(139, 69, 19, 0.3);
+            position: relative;
+        }
+        
+        .skull-perch {
+            bottom: 25%;
+            right: 15%;
+            width: 80px;
+            height: 100px;
+            background: 
+                linear-gradient(45deg, #f5f5dc, #e6e6fa, #f5f5dc),
+                radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 
+                inset 0 0 15px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(245, 245, 220, 0.2);
+            position: relative;
+        }
+        
+        .window-perch {
+            bottom: 60%;
+            right: 5%;
+            width: 150px;
+            height: 20px;
+            background: 
+                linear-gradient(45deg, #8b4513, #a0522d, #8b4513),
+                radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 0 5px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.6),
+                0 0 20px rgba(139, 69, 19, 0.2);
+            position: relative;
+        }
+        
+        .raven {
+            position: absolute;
+            bottom: 45%;
+            width: 120px;
+            height: 90px;
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)) sepia(0.1) contrast(1.1);
+        }
+        
+        .raven:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.7)) sepia(0.15) contrast(1.15) brightness(1.05);
+        }
+        
+        .status-panel {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #d4af37;
+            font-size: 0.9rem;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+        
+        .status-bar {
+            width: 150px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        
+        .status-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f4e4bc);
+            transition: width 0.3s ease;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Crimson Text', serif;
+        }
+        
+        .control-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .message.show {
+            opacity: 1;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes wingFlutterLeft {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(15deg); }
+        }
+        
+        @keyframes wingFlutterRight {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(-15deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">The Gothic Raven</h1>
+        
+        <div class="status-panel">
+            <div>Hunger: <div class="status-bar"><div class="status-fill" id="hunger-bar" style="width: 100%"></div></div></div>
+            <div>Happiness: <div class="status-bar"><div class="status-fill" id="happiness-bar" style="width: 100%"></div></div></div>
+            <div>Energy: <div class="status-bar"><div class="status-fill" id="energy-bar" style="width: 100%"></div></div></div>
+        </div>
+        
+        <div class="raven-scene">
+            <div class="perch pallas-bust" id="pallas-perch"></div>
+            <div class="perch skull-perch" id="skull-perch"></div>
+            <div class="perch window-perch" id="window-perch"></div>
+            
+            <div class="raven" id="raven">
+                <svg class="raven-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Raven body -->
+                    <ellipse cx="50" cy="60" rx="25" ry="15" fill="#1a1a1a" stroke="#d4af37" stroke-width="1"/>
+                    <!-- Raven head -->
+                    <circle cx="50" cy="35" r="12" fill="#1a1a1a" stroke="#d4af37" stroke-width="1"/>
+                    <!-- Raven beak -->
+                    <polygon points="50,35 45,30 55,30" fill="#d4af37"/>
+                    <!-- Raven eyes -->
+                    <circle cx="47" cy="33" r="2" fill="#d4af37"/>
+                    <circle cx="53" cy="33" r="2" fill="#d4af37"/>
+                    <!-- Raven wings -->
+                    <path class="wing left-wing" d="M25 50 Q15 40 25 30 Q35 40 25 50" fill="#1a1a1a" stroke="#d4af37" stroke-width="1"/>
+                    <path class="wing right-wing" d="M75 50 Q85 40 75 30 Q65 40 75 50" fill="#1a1a1a" stroke="#d4af37" stroke-width="1"/>
+                    <!-- Raven tail -->
+                    <path d="M25 60 Q15 70 25 75 Q35 70 25 60" fill="#1a1a1a" stroke="#d4af37" stroke-width="1"/>
+                </svg>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" onclick="feedRaven()">Feed</button>
+            <button class="control-btn" onclick="playWithRaven()">Play</button>
+            <button class="control-btn" onclick="petRaven()">Pet</button>
+            <button class="control-btn" onclick="moveRaven()">Move</button>
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        class RavenPet {
+            constructor() {
+                this.hunger = 100;
+                this.happiness = 100;
+                this.energy = 100;
+                this.currentPerch = 'pallas-perch';
+                this.messages = [
+                    "Nevermore...",
+                    "Quoth the raven...",
+                    "Darkness and mystery...",
+                    "The night calls...",
+                    "Ancient wisdom flows...",
+                    "Shadows dance...",
+                    "Eternal night...",
+                    "Gothic beauty..."
+                ];
+                this.init();
+            }
+            
+            init() {
+                this.updateStatusBars();
+                this.startDecay();
+                this.setupPerchInteractions();
+                this.setupRavenInteraction();
+            }
+            
+            updateStatusBars() {
+                document.getElementById('hunger-bar').style.width = this.hunger + '%';
+                document.getElementById('happiness-bar').style.width = this.happiness + '%';
+                document.getElementById('energy-bar').style.width = this.energy + '%';
+            }
+            
+            showMessage(text) {
+                const messageEl = document.getElementById('message');
+                messageEl.textContent = text;
+                messageEl.classList.add('show');
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 2000);
+            }
+            
+            feedRaven() {
+                if (this.hunger < 100) {
+                    this.hunger = Math.min(100, this.hunger + 30);
+                    this.happiness += 10;
+                    this.showMessage("The raven gratefully accepts your offering...");
+                    this.updateStatusBars();
+                } else {
+                    this.showMessage("The raven is not hungry...");
+                }
+            }
+            
+            playWithRaven() {
+                if (this.energy > 20) {
+                    this.happiness = Math.min(100, this.happiness + 25);
+                    this.energy -= 15;
+                    this.showMessage("The raven spreads its wings in delight...");
+                    this.updateStatusBars();
+                } else {
+                    this.showMessage("The raven is too tired to play...");
+                }
+            }
+            
+            petRaven() {
+                this.happiness = Math.min(100, this.happiness + 15);
+                this.showMessage("The raven leans into your touch...");
+                this.updateStatusBars();
+            }
+            
+            moveRaven() {
+                const perches = ['pallas-perch', 'skull-perch', 'window-perch'];
+                const currentIndex = perches.indexOf(this.currentPerch);
+                const nextIndex = (currentIndex + 1) % perches.length;
+                const nextPerch = perches[nextIndex];
+                
+                // Remove active class from current perch
+                document.getElementById(this.currentPerch).classList.remove('active');
+                
+                // Add active class to new perch
+                document.getElementById(nextPerch).classList.add('active');
+                
+                this.currentPerch = nextPerch;
+                this.energy -= 5;
+                this.showMessage("The raven gracefully moves to a new perch...");
+                this.updateStatusBars();
+            }
+            
+            startDecay() {
+                setInterval(() => {
+                    this.hunger = Math.max(0, this.hunger - 1);
+                    this.happiness = Math.max(0, this.happiness - 0.5);
+                    this.energy = Math.max(0, this.energy - 0.3);
+                    this.updateStatusBars();
+                    
+                    if (this.hunger < 20) {
+                        this.showMessage("The raven looks hungry...");
+                    }
+                    if (this.happiness < 20) {
+                        this.showMessage("The raven seems sad...");
+                    }
+                    if (this.energy < 20) {
+                        this.showMessage("The raven appears tired...");
+                    }
+                }, 5000); // Decay every 5 seconds
+            }
+            
+            setupPerchInteractions() {
+                const perches = document.querySelectorAll('.perch');
+                perches.forEach(perch => {
+                    perch.addEventListener('click', () => {
+                        if (this.currentPerch !== perch.id) {
+                            this.moveRaven();
+                        }
+                    });
+                });
+            }
+            
+            setupRavenInteraction() {
+                const raven = document.getElementById('raven');
+                raven.addEventListener('click', () => {
+                    const randomMessage = this.messages[Math.floor(Math.random() * this.messages.length)];
+                    this.showMessage(randomMessage);
+                    this.happiness += 5;
+                    this.updateStatusBars();
+                });
+            }
+        }
+        
+        // Initialize the raven pet when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.ravenPet = new RavenPet();
+        });
+        
+        // Global functions for button interactions
+        function feedRaven() {
+            window.ravenPet.feedRaven();
+        }
+        
+        function playWithRaven() {
+            window.ravenPet.playWithRaven();
+        }
+        
+        function petRaven() {
+            window.ravenPet.petRaven();
+        }
+        
+        function moveRaven() {
+            window.ravenPet.moveRaven();
+        }
+    </script>
+</body>
+</html> 

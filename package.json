@@ -1,0 +1,29 @@
+{
+  "name": "cute-cat-pet",
+  "version": "1.0.0",
+  "description": "An interactive cat pet with todo list and gamification features",
+  "main": "cute-cat-pet.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "cat",
+    "pet",
+    "todo",
+    "game",
+    "interactive",
+    "pwa",
+    "accessibility"
+  ],
+  "author": "Cat Pet App",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/cute-cat-pet.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
