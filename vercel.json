@@ -1,42 +1,13 @@
 {
   "version": 2,
-  "name": "cute-cat-pet",
-  "builds": [
+  "rewrites": [
     {
-      "src": "cute-cat-pet.html",
-      "use": "@vercel/static"
+      "source": "/",
+      "destination": "/cute-cat-pet.html"
     },
     {
-      "src": "sw.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "manifest.json",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/cute-cat-pet.html"
-    },
-    {
-      "src": "/sw.js",
-      "dest": "/sw.js",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json",
-      "headers": {
-        "Content-Type": "application/json"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/cute-cat-pet.html"
+      "source": "/(.*)",
+      "destination": "/cute-cat-pet.html"
     }
   ],
   "headers": [
